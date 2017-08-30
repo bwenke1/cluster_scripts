@@ -1,0 +1,51 @@
+#!/bin/bash
+##################################################################
+# This is an example script
+# "#PBS" is a PBS directive
+# If you don't specify here, default values will be used
+##################################################################
+# Try NOT to declare any variables before the PBS declarations
+# The -S flag is used to specify the UNIX shell that will be used to execute the script. 
+#PBS -S /bin/bash
+#PBS -V
+# Job name
+#PBS -N ExampleJob
+#PBS -l walltime=00:05:00,cput=00:05:00
+#PBS -e /net/brmaster/data/work/welison/jobs/logs/error.txt
+#PBS -o /net/brmaster/data/work/welison/jobs/logs/output.txt
+# The two lines bellow will be ignored as PBS directives
+# There is a bug on maui that if you request "PBS -l nodes=n:ppn=1", it will not allocate it properly
+# Instead, use "ppn" > 1 and adjust "nodes" to match how many processors you want, for example, you want
+# 10 processors: "#PBS -l nodes=5:ppn=2" OR "#PBS -l nodes=2:ppn=5"
+##PBS -l nodes=3:ppn=2
+# Request 1 gigabyte of memory per process
+##PBS -l pmem=1gb
+# Node(s) that the job will be executed
+##PBS -l nodes=brnode01+brnode03+brnode05:ppn=1
+# Queue that the job will execute, our default queue is "br"
+##PBS -q br
+# Send an email when the job a=aborts, b=begins or e=ends
+#PBS -m abe
+# Send email to the user
+#PBS -M bwenke@caltech.edu
+
+# By default, PBS executes your job from your home directory. Change to the directory where you submitted your job.
+cd $PBS_O_WORKDIR 
+echo "Current working directory is `pwd`"
+echo "Node file: $PBS_NODEFILE :"
+echo "---------------------"
+cat $PBS_NODEFILE
+echo "---------------------"
+echo "Running on $PBS_NP cores."
+# On systems where $PBS_NP is not available, one could use:
+# CORES=`/bin/awk 'END {print NR}' $PBS_NODEFILE`
+# echo "Running on $CORES cores."
+echo "Starting run at: `date`"
+
+# Set the number of threads that OpenMP can use to the number of cores requested
+export OMP_NUM_THREADS=$CORES
+
+# Source the SBGrid script 
+source /programs/sbgrid.cshrc
+# Wait
+sleep 60

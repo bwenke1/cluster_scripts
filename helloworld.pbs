@@ -1,0 +1,9 @@
+#!    /bash -login
+#Queue that the job will execute
+#PBS -q br
+# Send an email
+#PBS -m abe
+# Send email to
+#PBS -M bwenke@caltech.edu
+cd $PBS O  ORKDIR
+mpirun --mca btl_tcp_if_include 172.20.100.0/24 helloworld.exe >> helloworld.txt
